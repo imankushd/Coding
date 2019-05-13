@@ -28,4 +28,4 @@ public class SecondHighestNumber {
 			if(second!=Integer.MIN_VALUE)
 				System.out.println("Second Largest element is "+second);
 		}
-}
+ }
