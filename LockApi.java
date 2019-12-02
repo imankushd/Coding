@@ -1,41 +1,47 @@
-import java.util.concurrent.locks.*;
+import java.util.Stack;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-class PrintJob implements Runnable{
-    
-	private PrintQueue pq; 
-	
-	PrintJob(PrintQueue pq)
-	{
-		this.pq=pq;
-	}
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		System.out.println(Thread.currentThread().getName()+" is going to start its job");
-		pq.printJob();
-	}
-	
-}
-
-class PrintQueue
+class ConditionLocking
 {
-	Lock lock=new ReentrantLock();
-	public void printJob()
+	Stack<Integer> s=new Stack<Integer>();
+	ReentrantLock lock =new ReentrantLock();
+	int CAPACITY=5;
+	
+	Condition StackFullCondition=lock.newCondition();
+	Condition StackEmptyCondition=lock.newCondition();
+
+	public void pushToStack(int item) throws InterruptedException
 	{
-		try {
 		lock.lock();
-		System.out.println(Thread.currentThread().getName()+" started printing the document");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
+		try {
+			
+			while(s.size()==CAPACITY)
+			{
+				StackFullCondition.await();
+			}
+			s.push(item);
+			StackEmptyCondition.signalAll();
 		}
 		finally {
-			System.out.println(Thread.currentThread().getName()+" printed the document.\nJob done.");
 			lock.unlock();
 		}
 	}
+	
+	public Integer popFromStack() throws InterruptedException
+	{
+		lock.lock();
+		try {
+			while(s.size()==0)
+				StackEmptyCondition.await();
+			return s.pop();
+		}
+		finally {
+			StackFullCondition.signalAll();
+			lock.unlock();
+		}
+	}
+
 }
 
 
@@ -43,16 +49,7 @@ public class LockApi {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		  PrintQueue printerQueue = new PrintQueue();
-	      Thread thread[] = new Thread[10];
-	      for (int i = 0; i < 10; i++)
-	      {
-	         thread[i] = new Thread(new PrintJob(printerQueue), "Thread " + i);
-	      }
-	      for (int i = 0; i < 10; i++)
-	      {
-	         thread[i].start();
-	      }
+
 	}
 
 }
