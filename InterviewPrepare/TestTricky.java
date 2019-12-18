@@ -81,7 +81,6 @@ public class TestTricky {
       3)- clone() method;
       4)- deserialisation;
       5)- newInstance() method of constuctor class*/
-      
 	}
 	
 }
