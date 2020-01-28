@@ -23,7 +23,7 @@ public class ImplementQueueUsingStack {
 		
 		if(s1.size()==MAX_CAPACITY)
 			throw new MyException("Stack OverFlow");
-		s1.add(key);
+		s1.push(key);
 	}
 	
 	public int deQueue()
